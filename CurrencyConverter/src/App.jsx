@@ -1,35 +1,88 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import CurrencyDropDown from "./CurrencyDropDown";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currencies, setcurrencies] = useState([]);
+  const [amount, setAmount] = useState("");
+  const [fromCurrencies, setFromCurrencies] = useState("USD");
+  const [toCurrencies, setToCurrencies] = useState("INR");
+  const [convertedAmount, setConvertedAmount] = useState(null);
+  const [converting, setConverting] = useState(null);
+  // https://api.frankfurter.app/currencies
+  // https://api.frankfurter.app/currencies?amount=1&fromUSD&toINR
+  console.log("currencies12", fromCurrencies);
+  console.log("currencies12", toCurrencies);
+  const fetchCurrencies = async () => {
+    try {
+      const res = await fetch("https://api.frankfurter.app/currencies");
+      const data = await res.json();
+      const currencyList = Object.keys(data);
+      console.log("Currency list:", currencyList);
+      setcurrencies(currencyList);
+    } catch (error) {
+      console.log("error fetching", error);
+    }
+  };
 
+  const convertCurrency = async() => {
+    if (!amount) return
+    setConverting(true)
+    try {
+      const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${fromCurrencies}&to=${toCurrencies}`);
+      const data = await res.json();
+  
+      setConvertedAmount(data.rates[toCurrencies] + "" + toCurrencies);
+    } catch (error) {
+      console.log("error fetching", error);
+    }finally{
+      setConverting(false)
+    }
+  }
+  useEffect(() => {
+    fetchCurrencies();
+  }, []);
+  //  console.log("currencies", currencies)
   return (
     <>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <h2>Currency convertor</h2>
+        <div>
+          <label>Amount</label>
+          <input
+            type="number"
+            placeholder="Enter Here"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+        </div>
+        {/* //from */}
+        <div>
+          <CurrencyDropDown
+            currencies={currencies}
+            title="from"
+            currency={fromCurrencies}
+            setcurrency={setFromCurrencies}
+            convertedAmount={convertedAmount}
+          />
+        </div>
+
+        {/* //to */}
+        <div>
+          <CurrencyDropDown
+            currencies={currencies}
+            title="to"
+            currency={toCurrencies}
+            setcurrency={setToCurrencies}
+            convertedAmount={convertedAmount}
+          />
+        </div>
+
+        <p>currency converted : {convertedAmount} </p>
+
+        <button onClick={convertCurrency}>convertor</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
