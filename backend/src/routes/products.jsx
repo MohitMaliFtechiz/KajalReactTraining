@@ -1,11 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-// const {getAllProduct, getAllProductTesting} = require('../controllers/products')
+const authcontroller = require("../controllers/products.jsx");
 
-// router.route('/').get(getAllProduct);
-// router.route('/testing').get(getAllProductTesting);
-const productDetails = async(app) =>{
+router.route("/signup").post(authcontroller.signup);
+router.route("/signin").post(authcontroller.signin);
 
-}
-
-module.exports  = router;
+module.exports = router;

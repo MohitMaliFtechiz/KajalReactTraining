@@ -1,14 +1,20 @@
-const express = require('express');
-const axios = require('axios')
 
-const getAllProduct = async("/", (req, res) => {
-        const { username, age } = req.body;
-        console.log("Received username:", username);
-        console.log("Received username:", age);
-        res.status(200).json({msg:"I am getAllProduct"});
-})
-const getAllProductTesting = async("/", (req, res) => {
-    res.status(200).json({msg:"I am getAllProductTesting"});
-})
+exports.signup = async(req, res) => {
+    try{
+        res.status(200).json({msg:"I am signup"});
+    }catch(error){
+        res.status(400).json({msg:"not signup"});
+    }
+  
+}
+exports.signin = async(req, res) => {
+    try{
+        console.log(req.body)
+        res.status(200).json({msg:"request body"});
+    }catch(error){
+        res.status(400).json({msg:"not signin"});
+    }
+  
+}
 
-module.exports  = {getAllProduct, getAllProductTesting};
+// module.exports  = {signup, signin};
