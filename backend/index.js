@@ -2,12 +2,10 @@ const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 const PORT = process.env.PORT || 8000;
-const router = require('./routes/products.jsx');
-const connectDB = require('./db/connectDb.jsx')
+const router = require('./routes/products.js');
+const connectDB = require('./db/connectDb.js');
 
 dotenv.config();
-
-
 
 app.use(express.json());
 
