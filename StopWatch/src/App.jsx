@@ -27,29 +27,32 @@ function App() {
 
   return (
     <>
-       <div className="container">
-      <div className="card">
-        <div className="card-header">Stop Watch</div>
-        <div className="card-body text-center">
-          <h5 className="card-title text-center my-4">{formatTime(count)}</h5>
-          <hr />
-          <button className="btn btn-primary mx-2" onClick={() => startHandler()}>
-            Start
-          </button>
-          <button
-            className="btn btn-primary mx-2"
-            onClick={() => clearInterval(intervalRefs.current)}
-          >
-            Pause
-          </button>
-          <button className="btn btn-primary" onClick={handleReset}>
-            Reset
-          </button>
+      <div className="container">
+        <div className="card">
+          <div className="card-header">Stop Watch</div>
+          <div className="card-body text-center">
+            <h5 className="card-title text-center my-4">{formatTime(count)}</h5>
+            <hr />
+            <button
+              className="btn btn-primary mx-2"
+              onClick={() => startHandler()}
+            >
+              Start
+            </button>
+            <button
+              className="btn btn-primary mx-2"
+              onClick={() => clearInterval(intervalRefs.current)}
+            >
+              Pause
+            </button>
+            <button className="btn btn-primary" onClick={handleReset}>
+              Reset
+            </button>
+          </div>
         </div>
-      </div>
-      <div>
-        <img src="./watch.jpeg" alt="" />
-      </div>
+        <div>
+          <img src="./watch.jpeg" alt="" />
+        </div>
       </div>
     </>
   );
