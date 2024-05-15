@@ -1,4 +1,4 @@
-# Spootify Coding Challenge 🎧
+# Spootify React and ExpressJS Coding Challenge 🎧
 
 # Tech Stack
 - React
