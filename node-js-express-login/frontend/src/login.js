@@ -1,5 +1,7 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const lableData = [
   {
@@ -22,15 +24,50 @@ const Login = () => {
     reset,
     formState: { errors },
   } = useForm();
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (data) => {
-    console.log("Registration data:", data);
-    reset();
+  const handleLogin = async (data) => {
+    console.log("Login endpoint hit");
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify(data),
+        // credentials: 'include',
+      });
+      const responseData = await response.json();
+      console.log("login data:", responseData.status);
+      if (responseData.msg === "Login successfully" ) {
+        console.log("Login successful:", responseData);
+        localStorage.setItem("token", responseData.token);
+        localStorage.setItem("userId", responseData.userId);
+
+        navigate("/dashboard");
+      } else {
+        console.error("Login failed", responseData.msg);
+        setErrorMessage(responseData.msg);
+      }
+      reset();
+    } catch (error) {
+      console.log("error", error);
+      setErrorMessage("An error occurred. Please try again.:", error);
+    }
   };
-  const handleError = (errors) => {};
-
-  const loginoptions = {
-    name: { required: "UserName is Required" },
+  const handleError = (errors) => {
+    console.error("Errors:", errors);
+  };
+  const loginOptions = {
+    username: {
+      required: "UserName is Required",
+      minLength: {
+        value: 2,
+        message: "Password must have at least 2 characters",
+      },
+    },
     password: {
       required: "password is required",
       minLength: {
@@ -79,10 +116,14 @@ const Login = () => {
                           className="form-control form-control-lg"
                           placeholder={data.placeholder}
                           // value={inputs[data.name]}
-                          {...register(data.name)}
+                          {...register(data.name, loginOptions[data.name])}
                           // onChange={inputsHandler}
                         />
-                        {errors?.name && errors.registerOptions.message}
+                        {errors[data.name] && (
+                          <span className="text-danger">
+                            {errors[data.name]?.message}
+                          </span>
+                        )}
                       </div>
                     </>
                   );
@@ -101,11 +142,16 @@ const Login = () => {
                       Remember me
                     </label>
                   </div>
+
                   <a href="#!" className="text-body">
                     Forgot password?
                   </a>
                 </div>
-
+                <div className="link-danger">
+                  {errorMessage && (
+                    <p className="error-message">{errorMessage}</p>
+                  )}
+                </div>
                 <div className="text-center text-lg-start mt-4 pt-2">
                   <button
                     type="submit"

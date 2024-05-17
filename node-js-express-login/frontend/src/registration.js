@@ -1,32 +1,32 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useNavigate} from "react-router-dom";
 import { useForm } from "react-hook-form";
 
 const lableData = [
   {
-    label: "Name", 
+    label: "Name",
     name: "username",
     type: "text",
     placeholder: "Enter your name",
   },
   {
-    label: "Email", 
+    label: "Email",
     name: "email",
     type: "email",
     placeholder: "Enter your email",
   },
   {
-      label: "Password", 
-      name: "password",
-      type: "password",
-      placeholder: "Enter your password",
-    },
-    {
-      label: "Role", 
-      name: "role",
-      type: "text",
-      placeholder: "Enter your role",
-    },
+    label: "Password",
+    name: "password",
+    type: "password",
+    placeholder: "Enter your password",
+  },
+  {
+    label: "Role",
+    name: "isAdmin",
+    type: "text",
+    placeholder: "Enter your role",
+  },
 ];
 
 const Registration = () => {
@@ -37,7 +37,11 @@ const Registration = () => {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate()
   const handleRegistration = async (data) => {
+    data.isAdmin = data.isAdmin === "admin" ? true : false;
+
+    console.log("data:", data);
     try {
       const response = await fetch("http://localhost:8000/api/auth/signup", {
         method: "POST",
@@ -47,13 +51,46 @@ const Registration = () => {
         body: JSON.stringify(data),
       });
       const responseData = response.json();
-      console.log("Registration response:", responseData);
+  
+      if (response.ok) {
+        console.log("Registration response:", responseData);
+        navigate("/login");
+      } else {
+        console.error("Registration failed:", responseData.msg);
+      }
+
       reset();
     } catch (error) {
       console.log("error:", error);
     }
   };
+  const handleError = (errors) => {
+    console.log(errors)
+  }
 
+  const registerOptions = {
+    username:{
+      required:"Name is required"
+    },
+    email:{
+      required:"Email is required",
+      pattern: {
+        value: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
+        message: "Email is not valid."
+      },
+  },
+    password:{
+      required:"Password is required",
+      minLength:{
+        value:6,
+        message:"Password must have atleast 6 character",
+      }
+    },
+    isAdmin:{
+      required:"Role is required"
+    },
+
+  }
   return (
     <>
       <section>
@@ -67,7 +104,7 @@ const Registration = () => {
               />
             </div>
             <div className="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-              <form onSubmit={handleSubmit(handleRegistration)}>
+              <form onSubmit={handleSubmit(handleRegistration, handleError)}>
                 <div className="d-flex flex-row align-items-center justify-content-center justify-content-lg-start mb-5">
                   <h1
                     className="lead fw-normal mb-0 me-3"
@@ -86,8 +123,15 @@ const Registration = () => {
                       name={data.name}
                       className="form-control form-control-lg"
                       placeholder={data.placeholder}
-                      {...register(data.name)}
+                      {...register(data.name,registerOptions[data.name])}
                     />
+                    {
+                      errors[data.name] && (
+                        <span className="text-danger">
+                          {errors[data.name]?.message}
+                        </span>
+                      )
+                    }
                   </div>
                 ))}
 
